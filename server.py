@@ -9,9 +9,7 @@ import socket
 import subprocess
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
-
 FOLDER_NAME = 'shared files'
-
 UPLOAD_DIR = os.path.join(SCRIPT_DIR, FOLDER_NAME)
 
 # makes the shared files directory accessible if it doesn't exist
@@ -43,7 +41,7 @@ class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
                     <div class="section-container">
                         <h4 class="section-title">Upload File</h4>
                         <form action="/upload" method="post" enctype="multipart/form-data" id="upload-form">
-                            <input type="file" name="file" class="upload-button"/>
+                            <input type="file" name="file" class="file-upload"/>
                             <input type="submit" value="Upload" class="input-button"/>
                         </form>
                     </div>
@@ -54,7 +52,7 @@ class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
             files = os.listdir(UPLOAD_DIR)
             for file in files:
                 file_url = f"/{FOLDER_NAME}/{file}"
-                html += f'<p><a href="{file_url}">{file}</a></p>'
+                html += f'<a href="{file_url}">{file}</a>'
             
             html += f"""
                     </div>
@@ -89,24 +87,11 @@ class MyHttpRequestHandler(http.server.SimpleHTTPRequestHandler):
                 self.send_header('Content-type', 'text/plain')
                 self.end_headers()
                 self.wfile.write(b'No file field in form.')
-        elif self.path == '/restart':
-            self.send_response(200)
-            self.send_header('Content-type', 'text/plain')
-            self.end_headers()
-            self.wfile.write(b'Restarting server...')
-            threading.Thread(target=self.restart_server).start()
         else:
             self.send_response(404)
             self.send_header('Content-type', 'text/plain')
             self.end_headers()
             self.wfile.write(b'Not Found.')
-
-
-    def restart_server(self):
-        print("Server is restarting...")
-        httpd.shutdown()
-        time.sleep(1)
-        os.execl(sys.executable, sys.executable, *sys.argv)
 
 def find_available_port(starting_port):
     port = starting_port
@@ -127,6 +112,12 @@ def kill_process_using_port(port):
     except Exception as e:
         print(f"Could not terminate process using port {port}: {e}")
 
+def get_local_ip():
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        # This doesn't have to be reachable; it's just for obtaining the local IP
+        s.connect(("8.8.8.8", 80))
+        return s.getsockname()[0]
+
 def start_server():
     global PORT, httpd
     PORT = find_available_port(INITIAL_PORT)
@@ -139,6 +130,10 @@ def start_server():
             with socketserver.TCPServer(("", PORT), handler_object) as httpd:
                 print(f"Serving at port {PORT}")
                 print("Server is running. Press Ctrl+C to stop the server.")
+                local_ip = get_local_ip()
+                print(f"Open your browser and go to: http://{local_ip}:{PORT}")
+                # wont work if no internet
+                print(f"Open URL as a QR: https://api.qrserver.com/v1/create-qr-code/?size=1000x1000&data={local_ip}:{PORT}")
                 httpd.serve_forever()
                 break  # Exit loop if server starts successfully
         except OSError as e:

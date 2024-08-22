@@ -14,17 +14,15 @@ body {
     margin: 1rem;
     background-color: #2b2d31;
 }
-.row-container{
-    display: flex;
-    flex-direction: row;
-    gap: 1rem;
-}
 .section-title{
     color: #ffffff;
     margin: 0.125rem 0 0.5rem 0;
 }
-p{
-    margin: 0;
+.section-container{
+    background-color: #313338;
+    border: #43464d solid 1px;
+    border-radius: 1rem;
+    padding: 16px;
 }
 a{
     word-wrap: break-word;
@@ -37,7 +35,7 @@ a{
     border-radius: 0.5rem;
 }
 a:hover{
-    background-color: #666b75;
+    background-color: #53575e;
 }
 form{
     display: flex; 
@@ -50,19 +48,17 @@ form{
     border: none;
     border-radius: 0.5rem;
     background-color: #ffffff;
+    font-weight: 600;
 }
 .input-button:hover{
-    background-color: #ddefff;
+    background-color: #d9e1e9;
     cursor: pointer;
 }
 input[type="file"] {
     color: #ffffff;
-}
-.section-container{
-    background-color: #313338;
-    border: #43464d solid 1px;
-    border-radius: 1rem;
-    padding: 16px;
+    padding: 1rem;
+    background: #202225;
+    border-radius: 0.5rem;
 }
 .w-full{
     width: 100%;
